@@ -234,10 +234,13 @@ class FinancialRAGPipeline:
         try:
             text_ids = [str(uuid.uuid4()) for _ in texts]
             summary_texts = [
-                Document(page_content = summary, metadata = {self.id_key: text_ids[i]}) for i, summary in enumerate(texts_summaries)
+                Document(page_content = summary, metadata = {self.id_key: text_ids[i], "type":"text summary"}) for i, summary in enumerate(texts_summaries)
+            ]
+            full_texts = [
+                Document(page_content = text.text, metadata = {self.id_key:text_ids[i],"type":"full summary"}) for i,text in enumerate(texts)
             ]
             encoded_texts = [str(text).encode('utf-8') for text in texts]
-            self.retriever.vectorstore.add_documents(summary_texts)
+            self.retriever.vectorstore.add_documents(summary_texts+full_texts)
             self.retriever.docstore.mset(list(zip(text_ids, encoded_texts)))
 
             logger.info(f"Stored {len(texts)} text documents")
@@ -250,16 +253,21 @@ class FinancialRAGPipeline:
         try:
             table_ids = [str(uuid.uuid4()) for _ in tables]
             summary_tables = [
-                Document(page_content = summary, metadata = {self.id_key:table_ids[i]})
+                Document(page_content = summary, metadata = {self.id_key:table_ids[i], "type":"table summary"})
                 for i, summary in enumerate(tables_summaries)
                 ]
+            # tables = [table.text for table in tables]
+            full_tables = [
+                Document(page_content=table.text, metadata ={self.id_key:table_ids[i], "type":"full table text"}) 
+                for i,table in enumerate(tables)
+            ]
             encoded_tables = [str(table.text).encode('utf-8') for table in tables]
-            self.retriever.vectorstore.add_documents(summary_tables)
+            self.retriever.vectorstore.add_documents(summary_tables+full_tables)
             self.retriever.docstore.mset(list(zip(table_ids, encoded_tables)))
             logger.info(f"Successfully stored {len(tables)} table documents")
 
         except Exception as e:
-            logger.error(f"Error occured storing table documetns: {e}")
+            logger.error(f"Error occured storing table documents: {e}")
             raise 
     
     def _store_image_documents(self, images, images_summaries):
@@ -281,20 +289,22 @@ class FinancialRAGPipeline:
     def query(self, question):
         try:
             logger.info(f"Processing query: {question}")
-            retrieved_data = self.retriever.invoke(question)
+            retrieved_data = self.vector_store.similarity_search(question, k = 3)
+            # retrieved_data = self.retriever.invoke(question)
 
             if not retrieved_data:
                 return "relavant information regarding your question not found"
-            
+            context = "\n\n".join([doc.page_content for doc in retrieved_data])
             chat_prompt = """
             You are an auditor/expert in reading financial statements.
             I will provide you report information. Based on information provide concise report.
-            The information is: {element}
+            Context: {context}
+            Question: {question}
             """
             prompt_chat = ChatPromptTemplate.from_template(chat_prompt)
             result_chain = prompt_chat| self.local_model | StrOutputParser()
 
-            response = result_chain.invoke({"element": retrieved_data})
+            response = result_chain.invoke({"context": context,"question":question})
             logger.info("Qeury processed successfully")
 
             return response 
