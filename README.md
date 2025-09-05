@@ -1,7 +1,7 @@
 
 # Financial RAG Pipeline
 
-A sophisticated Retrieval-Augmented Generation (RAG) system designed to analyze and extract insights from financial PDF reports using LangChain, Ollama, and multimodal processing capabilities.
+
 
 ## Features
 
