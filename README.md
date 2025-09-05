@@ -54,15 +54,7 @@ ollama pull gemma3:4b
     pip install -r requirements.txt
     
     ```
-    
-3.  **Set up environment variables** Create a `.env` file in the root directory:
-    
-    ```env
-    OPENAI_API_KEY=your_openai_api_key_here
-    
-    ```
-    
-
+   
 ## Dependencies
 
 Create a `requirements.txt` file with these dependencies:
