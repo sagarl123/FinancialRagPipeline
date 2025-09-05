@@ -55,7 +55,7 @@ ollama pull gemma3:4b
 
 ```bash
 
-git clone <your-repo-url>
+git clone git@github.com:sagarl123/FinancialRagPipeline.git
 
 cd financial-rag-pipeline
 
