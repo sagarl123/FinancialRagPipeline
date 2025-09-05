@@ -1,0 +1,10 @@
+# created by virtualenv automatically
+bin/
+lib/
+chroma_langchain_db/
+local_docstore/
+share/
+.env 
+*.ipynb
+*.cfg 
+CACHEDIR
