@@ -8,3 +8,4 @@ share/
 *.ipynb
 *.cfg 
 CACHEDIR
+*.DS_Store
