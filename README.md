@@ -8,7 +8,7 @@
 -   **PDF Content Extraction**: Processes complex financial PDFs with text, tables, and images
 -   **Multimodal Analysis**: Handles text, tabular data, and image content from financial documents
 -   **Vector Storage**: Uses Chroma for efficient similarity search and retrieval
--   **Multi-Model Support**: Integrates both local (Ollama) and cloud-based (OpenAI) language models
+-   **Multi-Model Support**: Integrates both local (Ollama) llama and gemma model
 -   **Financial Expertise**: Specialized prompts for financial report analysis and auditing
 
 ## Architecture
